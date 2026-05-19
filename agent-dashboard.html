@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - 9jaAgentsConnect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --secondary: #00C853;
+            --accent: #FF6B35;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --gradient: linear-gradient(135deg, #0066FF 0%, #00C853 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--dark);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .sidebar-logo i {
+            color: var(--secondary);
+        }
+
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .agent-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .agent-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+        }
+
+        .agent-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-info p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            color: var(--gray);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,102,255,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: var(--white);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: rgba(0,102,255,0.1); color: var(--primary); }
+        .stat-icon.green { background: rgba(0,200,83,0.1); color: var(--secondary); }
+        .stat-icon.orange { background: rgba(255,107,53,0.1); color: var(--accent); }
+        .stat-icon.purple { background: rgba(138,43,226,0.1); color: #8a2be2; }
+
+        .stat-content h3 {
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Sections */
+        .section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        label .required {
+            color: var(--accent);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Property Cards Grid */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .property-card {
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .property-image {
+            height: 180px;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .property-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-sale { background: var(--secondary); color: white; }
+        .badge-rent { background: var(--accent); color: white; }
+
+        .property-info {
+            padding: 1rem;
+        }
+
+        .property-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .property-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .property-location {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .property-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Image Upload */
+        .image-upload-area {
+            border: 2px dashed #e9ecef;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0,102,255,0.05);
+        }
+
+        .image-upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .image-upload-area input {
+            display: none;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 3000;
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--secondary); }
+        .toast.error { background: #dc3545; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <i class="fas fa-home"></i>
+                    9jaAgentsConnect
+                </a>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-th-large"></i>
+                    Dashboard
+                </button>
+                <button class="nav-item" onclick="showSection('listings')">
+                    <i class="fas fa-home"></i>
+                    My Listings
+                </button>
+                <button class="nav-item" onclick="openAddPropertyModal()">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Property
+                </button>
+                <button class="nav-item" onclick="showSection('leads')">
+                    <i class="fas fa-envelope"></i>
+                    Leads
+                    <span class="badge" id="leadsCount" style="background: var(--accent); color: white; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: auto;">0</span>
+                </button>
+                <button class="nav-item" onclick="showSection('profile')">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </button>
+                <button class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="agent-profile">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Agent" class="agent-avatar" id="sidebarAvatar">
+                    <div class="agent-info">
+                        <h4 id="sidebarName">Loading...</h4>
+                        <p>Agent</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section">
+                <div class="header-bar">
+                    <div class="page-title">
+                        <h1>Dashboard</h1>
+                        <p>Welcome back! Here's what's happening with your listings.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddPropertyModal()">
+                        <i class="fas fa-plus"></i> Add New Property
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalListings">0</h3>
+                            <p>Active Listings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalViews">0</h3>
+                            <p>Total Views</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalLeads">0</h3>
+                            <p>New Leads</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalCalls">0</h3>
+                            <p>Phone Inquiries</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Listings -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock"></i> Recent Listings
+                        </h2>
+                        <button class="btn btn-outline btn-sm" onclick="showSection('listings')">
+                            View All
+                        </button>
+                    </div>
+                    <div id="recentListings">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-bolt"></i> Quick Actions
+                        </h2>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="openAddPropertyModal()">
+                            <i class="fas fa-plus"></i> Add Property
+                        </button>
+                        <button class="btn btn-outline" onclick="showSection('profile')">
+                            <i class="fas fa-user"></i> Edit Profile
+                        </button>
+                        <button class="btn btn-outline" onclick="shareProfile()">
+                            <i class="fas fa-share"></i> Share Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listings Section -->
+            <div id="listings-section" style="display: none;">
+                <div class="header-bar">
+                    <div class="page-title">
+                        <h1>My Listings</h1>
+                        <p>Manage all your property listings here.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddPropertyModal()">
+                        <i class="fas fa-plus"></i> Add New Property
+                    </button>
+                </div>
+
+                <div class="section">
+                    <div id="allListings">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile-section" style="display: none;">
+                <div class="header-bar">
+                    <div class="page-title">
+                        <h1>My Profile</h1>
+                        <p>Update your information and settings.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 style="margin-bottom: 1.5rem;">Profile Information</h3>
+                    <form class="form-grid" onsubmit="updateProfile(event)">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="profileName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="profileEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="profilePhone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Company/Agency</label>
+                            <input type="text" id="profileCompany" name="company">
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <select id="profileLocation" name="location">
+                                <option value="Lagos">Lagos</option>
+                                <option value="Abuja">Abuja</option>
+                                <option value="Port Harcourt">Port Harcourt</option>
+                                <option value="Ibadan">Ibadan</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Property Modal -->
+    <div class="modal" id="addPropertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-home"></i> Add New Property</h2>
+                <button class="modal-close" onclick="closeAddPropertyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="propertyForm" onsubmit="saveProperty(event)">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Property Title <span class="required">*</span></label>
+                            <input type="text" name="title" required placeholder="e.g., Luxury 4 Bedroom Duplex">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label>Description <span class="required">*</span></label>
+                            <textarea name="description" required placeholder="Describe the property..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Property Type <span class="required">*</span></label>
+                            <select name="propertyType" required>
+                                <option value="">Select type</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="duplex">Duplex</option>
+                                <option value="bungalow">Bungalow</option>
+                                <option value="terrace">Terrace</option>
+                                <option value="mansion">Mansion</option>
+                                <option value="land">Land</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Listing Type <span class="required">*</span></label>
+                            <select name="listingType" required>
+                                <option value="">Select</option>
+                                <option value="sale">For Sale</option>
+                                <option value="rent">For Rent</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price (₦) <span class="required">*</span></label>
+                            <input type="number" name="price" required placeholder="e.g., 45000000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Location <span class="required">*</span></label>
+                            <input type="text" name="location" required placeholder="e.g., Lekki Phase 1, Lagos">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bedrooms</label>
+                            <input type="number" name="bedrooms" min="0" placeholder="e.g., 4">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bathrooms</label>
+                            <input type="number" name="bathrooms" min="0" placeholder="e.g., 5">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Area (sqm)</label>
+                            <input type="number" name="area" placeholder="e.g., 450">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Property Images</label>
+                            <div class="image-upload-area" onclick="document.getElementById('propertyImages').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload images</p>
+                                <small>Recommended: 1200x800px, Max 5MB each</small>
+                            </div>
+                            <input type="file" id="propertyImages" multiple accept="image/*" onchange="previewImages(event)">
+                            <div class="preview-grid" id="imagePreview"></div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Features</label>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" name="features" value="air-conditioning"> Air Conditioning
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" name="features" value="swimming-pool"> Swimming Pool
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" name="features" value="security"> Security
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" name="features" value="parking"> Parking
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" name="features" value="furnished"> Furnished
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeAddPropertyModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="document.getElementById('propertyForm').dispatchEvent(new Event('submit'))">
+                    <i class="fas fa-save"></i> Save Property
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Current agent data
+        let currentAgent = null;
+        let agentProperties = [];
+        let tempImages = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAgentData();
+            updateStats();
+            loadRecentListings();
+        });
+
+        function loadAgentData() {
+            currentAgent = JSON.parse(localStorage.getItem('currentAgent'));
+            
+            if (!currentAgent) {
+                // Redirect to login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update sidebar
+            document.getElementById('sidebarName').textContent = currentAgent.name;
+            if (currentAgent.avatar) {
+                document.getElementById('sidebarAvatar').src = currentAgent.avatar;
+            }
+
+            // Load profile form
+            document.getElementById('profileName').value = currentAgent.name;
+            document.getElementById('profileEmail').value = currentAgent.email;
+            document.getElementById('profilePhone').value = currentAgent.phone || '';
+            document.getElementById('profileCompany').value = currentAgent.company || '';
+            document.getElementById('profileLocation').value = currentAgent.location || 'Lagos';
+
+            // Load agent's properties
+            const allProperties = JSON.parse(localStorage.getItem('9jaProperties') || '[]');
+            agentProperties = allProperties.filter(p => p.agentId === currentAgent.id);
+        }
+
+        function updateStats() {
+            document.getElementById('totalListings').textContent = agentProperties.length;
+            document.getElementById('totalViews').textContent = agentProperties.reduce((sum, p) => sum + (p.views || 0), 0);
+            document.getElementById('totalLeads').textContent = Math.floor(Math.random() * 20); // Simulated
+            document.getElementById('totalCalls').textContent = Math.floor(Math.random() * 15); // Simulated
+        }
+
+        function loadRecentListings() {
+            const container = document.getElementById('recentListings');
+            const allContainer = document.getElementById('allListings');
+
+            if (agentProperties.length === 0) {
+                const emptyHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-home"></i>
+                        <h3>No Properties Yet</h3>
+                        <p>Start by adding your first property listing.</p>
+                        <button class="btn btn-primary" onclick="openAddPropertyModal()">
+                            <i class="fas fa-plus"></i> Add Property
+                        </button>
+                    </div>
+                `;
+                container.innerHTML = emptyHTML;
+                allContainer.innerHTML = emptyHTML;
+                return;
+            }
+
+            const recentHTML = agentProperties.slice(0, 3).map(createPropertyCard).join('');
+            const allHTML = agentProperties.map(createPropertyCard).join('');
+
+            container.innerHTML = `<div class="properties-grid">${recentHTML}</div>`;
+            allContainer.innerHTML = `<div class="properties-grid">${allHTML}</div>`;
+        }
+
+        function createPropertyCard(property) {
+            const badgeClass = property.listingType === 'sale' ? 'badge-sale' : 'badge-rent';
+            const badgeText = property.listingType === 'sale' ? 'For Sale' : 'For Rent';
+            
+            return `
+                <div class="property-card">
+                    <div class="property-image">
+                        ${property.images && property.images.length > 0 
+                            ? `<img src="${property.images[0]}" alt="${property.title}">`
+                            : '<i class="fas fa-home" style="font-size: 3rem; color: #adb5bd;"></i>'
+                        }
+                        <span class="property-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="property-info">
+                        <div class="property-price">₦${parseInt(property.price).toLocaleString()}</div>
+                        <div class="property-title">${property.title}</div>
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i> ${property.location}
+                        </div>
+                        <div class="property-stats">
+                            ${property.bedrooms ? `<span><i class="fas fa-bed"></i> ${property.bedrooms} beds</span>` : ''}
+                            ${property.bathrooms ? `<span><i class="fas fa-bath"></i> ${property.bathrooms} baths</span>` : ''}
+                            <span><i class="fas fa-eye"></i> ${property.views || 0} views</span>
+                        </div>
+                    </div>
+                    <div class="property-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editProperty(${property.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProperty(${property.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Section Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('listings-section').style.display = 'none';
+            document.getElementById('profile-section').style.display = 'none';
+
+            // Show selected
+            document.getElementById(section + '-section').style.display = 'block';
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Modal Functions
+        function openAddPropertyModal() {
+            document.getElementById('addPropertyModal').classList.add('active');
+            tempImages = [];
+        }
+
+        function closeAddPropertyModal() {
+            document.getElementById('addPropertyModal').classList.remove('active');
+            document.getElementById('propertyForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            tempImages = [];
+        }
+
+        // Image Preview
+        function previewImages(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    tempImages.push(e.target.result);
+                    updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = tempImages.map((img, index) => `
+                <div class="preview-item">
+                    <img src="${img}" alt="Preview">
+                    <button type="button" class="remove" onclick="removeImage(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeImage(index) {
+            tempImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        // Save Property
+        function saveProperty(event) {
+            event.preventDefault();
+            
+            if (!currentAgent) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // Get selected features
+            const features = Array.from(form.querySelectorAll('input[name="features"]:checked'))
+                .map(cb => cb.value);
+
+            const property = {
+                id: Date.now(),
+                agentId: currentAgent.id,
+                agentName: currentAgent.name,
+                agentPhone: currentAgent.phone,
+                agentWhatsapp: currentAgent.whatsapp,
+                agentEmail: currentAgent.email,
+                agentAltEmail: currentAgent.altEmail,
+                title: formData.get('title'),
+                description: formData.get('description'),
+                propertyType: formData.get('propertyType'),
+                listingType: formData.get('listingType'),
+                price: formData.get('price'),
+                location: formData.get('location'),
+                state: currentAgent.state,
+                city: currentAgent.city,
+                bedrooms: formData.get('bedrooms') || 0,
+                bathrooms: formData.get('bathrooms') || 0,
+                area: formData.get('area') || 0,
+                images: tempImages,
+                features: features,
+                views: 0,
+                createdAt: new Date().toISOString(),
+                status: 'active'
+            };
+
+            // Save to localStorage
+            let allProperties = JSON.parse(localStorage.getItem('9jaProperties') || '[]');
+            allProperties.push(property);
+            localStorage.setItem('9jaProperties', JSON.stringify(allProperties));
+
+            // Update agent listings count
+            currentAgent.listings = (currentAgent.listings || 0) + 1;
+            localStorage.setItem('currentAgent', JSON.stringify(currentAgent));
+
+            // Update agents list
+            let agents = JSON.parse(localStorage.getItem('9jaAgents') || '[]');
+            const agentIndex = agents.findIndex(a => a.id === currentAgent.id);
+            if (agentIndex >= 0) {
+                agents[agentIndex].listings = currentAgent.listings;
+                localStorage.setItem('9jaAgents', JSON.stringify(agents));
+            }
+
+            showToast('Property saved successfully!', 'success');
+            closeAddPropertyModal();
+            
+            // Refresh
+            agentProperties.push(property);
+            updateStats();
+            loadRecentListings();
+        }
+
+        // Edit Property
+        function editProperty(id) {
+            showToast('Edit functionality coming soon!', 'success');
+        }
+
+        // Delete Property
+        function deleteProperty(id) {
+            if (!confirm('Are you sure you want to delete this property?')) return;
+
+            let allProperties = JSON.parse(localStorage.getItem('9jaProperties') || '[]');
+            allProperties = allProperties.filter(p => p.id !== id);
+            localStorage.setItem('9jaProperties', JSON.stringify(allProperties));
+
+            agentProperties = agentProperties.filter(p => p.id !== id);
+            updateStats();
+            loadRecentListings();
+
+            showToast('Property deleted', 'success');
+        }
+
+        // Update Profile
+        function updateProfile(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            
+            currentAgent.name = formData.get('name');
+            currentAgent.email = formData.get('email');
+            currentAgent.phone = formData.get('phone');
+            currentAgent.company = formData.get('company');
+            currentAgent.location = formData.get('location');
+
+            localStorage.setItem('currentAgent', JSON.stringify(currentAgent));
+            
+            // Update sidebar
+            document.getElementById('sidebarName').textContent = currentAgent.name;
+
+            showToast('Profile updated successfully!', 'success');
+        }
+
+        // Share Profile
+        function shareProfile() {
+            const url = `${window.location.origin}/agent/${currentAgent.id}`;
+            navigator.clipboard.writeText(url);
+            showToast('Profile link copied to clipboard!', 'success');
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentAgent');
+            window.location.href = 'index.html';
+        }
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

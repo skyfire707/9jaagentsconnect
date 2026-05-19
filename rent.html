@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent Houses - 9jaAgentsConnect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --secondary: #00C853;
+            --accent: #FF6B35;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --gradient: linear-gradient(135deg, #0066FF 0%, #00C853 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo i { color: var(--secondary); }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(0,102,255,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,102,255,0.4);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--accent) 0%, #e55a2b 100%);
+            padding: 7rem 2rem 2rem;
+            color: var(--white);
+        }
+
+        .page-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            opacity: 0.9;
+        }
+
+        .search-bar {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 2rem;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .search-group {
+            position: relative;
+        }
+
+        .search-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        .search-group input,
+        .search-group select {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-group input:focus,
+        .search-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .search-group i {
+            position: absolute;
+            left: 1rem;
+            top: 2.5rem;
+            color: var(--gray);
+        }
+
+        .search-btn {
+            padding: 0.875rem 2rem;
+            background: var(--secondary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background: #00a847;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .filters-sidebar {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .filter-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .filter-section:last-child { border-bottom: none; }
+
+        .filter-section h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .filter-option input { width: auto; }
+        .filter-option span { color: var(--gray); font-size: 0.875rem; }
+
+        .price-range {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .price-range input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-count { font-size: 1.125rem; }
+        .results-count span { font-weight: 700; color: var(--primary); }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sort-options select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .view-toggle { display: flex; gap: 0.5rem; }
+
+        .view-btn {
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            background: var(--white);
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .properties-grid.list-view { grid-template-columns: 1fr; }
+
+        .property-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .property-image {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .property-card:hover .property-image img { transform: scale(1.1); }
+
+        .property-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: var(--accent);
+            color: var(--white);
+        }
+
+        .property-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .property-info { padding: 1.25rem; }
+
+        .property-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .property-price span {
+            font-size: 0.875rem;
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .property-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .property-location {
+            color: var(--gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .property-features {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        .feature i { color: var(--primary); }
+
+        .property-agent {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .agent-details h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .agent-details span {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .contact-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .map-section {
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        #map { width: 100%; height: 100%; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .page-btn {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e9ecef;
+            background: var(--white);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            background: var(--white);
+            border-radius: 12px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 3000;
+        }
+
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+            .filters-sidebar { position: static; }
+            .search-form { grid-template-columns: 1fr; }
+            .map-section { height: 300px; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .page-header h1 { font-size: 1.75rem; }
+            .properties-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-home"></i>
+                9jaAgentsConnect
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="buy.html">Buy</a></li>
+                    <li><a href="rent.html" class="active">Rent</a></li>
+                    <li><a href="agent-register.html">Become an Agent</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </nav>
+            <div>
+                <a href="agent-register.html" class="btn btn-primary">List Property</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="page-header-content">
+            <h1>Houses for Rent in Nigeria</h1>
+            <p>Find your perfect rental home across Lagos, Abuja, Port Harcourt & more</p>
+
+            <div class="search-bar">
+                <form class="search-form" onsubmit="searchProperties(event)">
+                    <div class="search-group">
+                        <label>Location</label>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="searchLocation" placeholder="Enter city or area">
+                    </div>
+                    <div class="search-group">
+                        <label>Property Type</label>
+                        <i class="fas fa-home"></i>
+                        <select id="searchType">
+                            <option value="">All Types</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="house">House</option>
+                            <option value="room">Room/Self Contain</option>
+                            <option value="office">Office Space</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <label>Min Price/Year</label>
+                        <i class="fas fa-naira-sign"></i>
+                        <select id="searchMinPrice">
+                            <option value="">No Min</option>
+                            <option value="200000">₦200K</option>
+                            <option value="500000">₦500K</option>
+                            <option value="1000000">₦1M</option>
+                            <option value="2000000">₦2M</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <label>Max Price/Year</label>
+                        <i class="fas fa-naira-sign"></i>
+                        <select id="searchMaxPrice">
+                            <option value="">No Max</option>
+                            <option value="500000">₦500K</option>
+                            <option value="1000000">₦1M</option>
+                            <option value="2000000">₦2M</option>
+                            <option value="5000000">₦5M</option>
+                            <option value="10000000">₦10M+</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <aside class="filters-sidebar">
+            <div class="filter-section">
+                <h4><i class="fas fa-filter"></i> Property Type</h4>
+                <label class="filter-option">
+                    <input type="checkbox" value="apartment" onchange="applyFilters()"> <span>Apartment</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="house" onchange="applyFilters()"> <span>House</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="room" onchange="applyFilters()"> <span>Room/Self Contain</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="office" onchange="applyFilters()"> <span>Office Space</span>
+                </label>
+            </div>
+
+            <div class="filter-section">
+                <h4><i class="fas fa-bed"></i> Bedrooms</h4>
+                <label class="filter-option">
+                    <input type="checkbox" value="1" onchange="applyFilters()"> <span>1 Bedroom</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="2" onchange="applyFilters()"> <span>2 Bedrooms</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="3" onchange="applyFilters()"> <span>3 Bedrooms</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="4" onchange="applyFilters()"> <span>4+ Bedrooms</span>
+                </label>
+            </div>
+
+            <div class="filter-section">
+                <h4><i class="fas fa-money-bill"></i> Price Range</h4>
+                <div class="price-range">
+                    <input type="number" placeholder="Min" id="filterMinPrice">
+                    <span>-</span>
+                    <input type="number" placeholder="Max" id="filterMaxPrice">
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="applyFilters()">Apply Filters</button>
+            </div>
+
+            <div class="filter-section">
+                <h4><i class="fas fa-map-marker-alt"></i> Location</h4>
+                <label class="filter-option">
+                    <input type="checkbox" value="Lagos" onchange="applyFilters()"> <span>Lagos</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="Abuja" onchange="applyFilters()"> <span>Abuja</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="Port Harcourt" onchange="applyFilters()"> <span>Port Harcourt</span>
+                </label>
+            </div>
+        </aside>
+
+        <div class="results-section">
+            <div class="map-section">
+                <div id="map"></div>
+            </div>
+
+            <div class="results-header">
+                <div class="results-count">Showing <span id="resultsCount">0</span> properties for rent</div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="sort-options">
+                        <label>Sort by:</label>
+                        <select id="sortBy" onchange="sortProperties()">
+                            <option value="newest">Newest</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('grid')"><i class="fas fa-th-large"></i></button>
+                        <button class="view-btn" onclick="setView('list')"><i class="fas fa-list"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="properties-grid" id="propertiesGrid"></div>
+
+            <div class="pagination" id="pagination">
+                <button class="page-btn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 9jaAgentsConnect. All rights reserved.</p>
+        <p style="opacity: 0.7; margin-top: 0.5rem;">Nigeria's #1 Real Estate Platform</p>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let allProperties = [];
+        let filteredProperties = [];
+        let currentPage = 1;
+        let itemsPerPage = 12;
+        let map;
+        let markers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProperties();
+            initMap();
+        });
+
+        function loadProperties() {
+            const agentProperties = JSON.parse(localStorage.getItem('9jaProperties') || '[]');
+            
+            const sampleRentals = [
+                {
+                    id: 101,
+                    title: "3 Bedroom Apartment in Lekki",
+                    location: "Lekki Phase 1, Lagos",
+                    price: 3500000,
+                    type: "apartment",
+                    bedrooms: 3,
+                    bathrooms: 3,
+                    area: 220,
+                    images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600"],
+                    agentName: "Grace Ojo",
+                    agentPhone: "+234 804 567 8901",
+                    agentAvatar: "https://randomuser.me/api/portraits/women/28.jpg",
+                    listingType: "rent",
+                    lat: 6.4474,
+                    lng: 3.4772,
+                    views: 189
+                },
+                {
+                    id: 102,
+                    title: "2 Bedroom Flat with BQ",
+                    location: "Victoria Island, Lagos",
+                    price: 4500000,
+                    type: "apartment",
+                    bedrooms: 2,
+                    bathrooms: 2,
+                    area: 180,
+                    images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600"],
+                    agentName: "Chioma Nnamdi",
+                    agentPhone: "+234 806 789 0123",
+                    agentAvatar: "https://randomuser.me/api/portraits/women/56.jpg",
+                    listingType: "rent",
+                    lat: 6.4281,
+                    lng: 3.4215,
+                    views: 156
+                },
+                {
+                    id: 103,
+                    title: "4 Bedroom Duplex for Rent",
+                    location: "Gwarinpa, Abuja",
+                    price: 6000000,
+                    type: "house",
+                    bedrooms: 4,
+                    bathrooms: 5,
+                    area: 500,
+                    images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600"],
+                    agentName: "Sarah Okonkwo",
+                    agentPhone: "+234 802 345 6789",
+                    agentAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
+                    listingType: "rent",
+                    lat: 9.0765,
+                    lng: 7.3986,
+                    views: 134
+                },
+                {
+                    id: 104,
+                    title: "Self Contain Apartment",
+                    location: "Wuse, Abuja",
+                    price: 800000,
+                    type: "room",
+                    bedrooms: 1,
+                    bathrooms: 1,
+                    area: 45,
+                    images: ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600"],
+                    agentName: "Ahmed Ibrahim",
+                    agentPhone: "+234 805 678 9012",
+                    agentAvatar: "https://randomuser.me/api/portraits/men/45.jpg",
+                    listingType: "rent",
+                    lat: 9.0820,
+                    lng: 7.5280,
+                    views: 223
+                },
+                {
+                    id: 105,
+                    title: "Office Space in Trans Amadi",
+                    location: "Port Harcourt, Rivers",
+                    price: 2500000,
+                    type: "office",
+                    bedrooms: 0,
+                    bathrooms: 2,
+                    area: 150,
+                    images: ["https://images.unsplash.com/photo-1497366216548-37526070297c?w=600"],
+                    agentName: "Michael Eze",
+                    agentPhone: "+234 803 456 7890",
+                    agentAvatar: "https://randomuser.me/api/portraits/men/67.jpg",
+                    listingType: "rent",
+                    lat: 4.8156,
+                    lng: 7.0498,
+                    views: 98
+                },
+                {
+                    id: 106,
+                    title: "Luxury 5 Bedroom House",
+                    location: "GRA Phase 2, Port Harcourt",
+                    price: 8000000,
+                    type: "house",
+                    bedrooms: 5,
+                    bathrooms: 6,
+                    area: 600,
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600"],
+                    agentName: "John Adeyemi",
+                    agentPhone: "+234 801 234 5678",
+                    agentAvatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                    listingType: "rent",
+                    lat: 4.8256,
+                    lng: 7.0598,
+                    views: 167
+                }
+            ];
+
+            allProperties = [...agentProperties.filter(p => p.listingType === 'rent'), ...sampleRentals];
+            filteredProperties = [...allProperties];
+            renderProperties();
+            updateMapMarkers();
+        }
+
+        function renderProperties() {
+            const grid = document.getElementById('propertiesGrid');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const properties = filteredProperties.slice(start, end);
+
+            document.getElementById('resultsCount').textContent = filteredProperties.length;
+
+            if (properties.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <i class="fas fa-search"></i>
+                        <h3>No rental properties found</h3>
+                        <p>Try adjusting your search criteria</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = properties.map(property => createPropertyCard(property)).join('');
+        }
+
+        function createPropertyCard(property) {
+            const isFavorite = isInFavorites(property.id);
+            const pricePerYear = `₦${property.price.toLocaleString()}`;
+            
+            return `
+                <div class="property-card" onclick="viewProperty(${property.id})">
+                    <div class="property-image">
+                        <img src="${property.images && property.images.length > 0 ? property.images[0] : 'https://via.placeholder.com/600x400?text=No+Image'}" alt="${property.title}">
+                        <span class="property-badge">For Rent</span>
+                        <div class="property-actions" onclick="event.stopPropagation()">
+                            <button class="action-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${property.id})" title="Save">
+                                <i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="property-info">
+                        <div class="property-price">${pricePerYear} <span>/ year</span></div>
+                        <h3 class="property-title">${property.title}</h3>
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i> ${property.location}
+                        </div>
+                        <div class="property-features">
+                            ${property.bedrooms ? `<div class="feature"><i class="fas fa-bed"></i> ${property.bedrooms}</div>` : ''}
+                            ${property.bathrooms ? `<div class="feature"><i class="fas fa-bath"></i> ${property.bathrooms}</div>` : ''}
+                            ${property.area ? `<div class="feature"><i class="fas fa-ruler-combined"></i> ${property.area}m²</div>` : ''}
+                        </div>
+                        <div class="property-agent" onclick="event.stopPropagation()">
+                            <div class="agent-info">
+                                <img src="${property.agentAvatar || 'https://via.placeholder.com/40'}" alt="${property.agentName}" class="agent-avatar">
+                                <div class="agent-details">
+                                    <h5>${property.agentName}</h5>
+                                    <span>Verified Agent</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                ${property.agentWhatsapp ? `<a href="https://wa.me/${property.agentWhatsapp.replace(/\+/g, '').replace(/\s/g, '')}" target="_blank" class="btn btn-success contact-btn" style="background: #25D366; color: white;" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                                ${property.agentEmail ? `<a href="mailto:${property.agentEmail}" class="btn btn-outline contact-btn" title="Email"><i class="fas fa-envelope"></i></a>` : ''}
+                                <button class="btn btn-primary contact-btn" onclick="contactAgent('${property.agentPhone}', '${property.agentName}')" title="Call">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initMap() {
+            map = L.map('map').setView([9.0820, 7.5280], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+        }
+
+        function updateMapMarkers() {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            filteredProperties.forEach(property => {
+                if (property.lat && property.lng) {
+                    const marker = L.marker([property.lat, property.lng])
+                        .addTo(map)
+                        .bindPopup(`<b>${property.title}</b><br>₦${property.price.toLocaleString()}/year`);
+                    markers.push(marker);
+                }
+            });
+
+            if (markers.length > 0) {
+                const group = new L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        function searchProperties(event) {
+            event.preventDefault();
+            
+            const location = document.getElementById('searchLocation').value.toLowerCase();
+            const type = document.getElementById('searchType').value;
+            const minPrice = document.getElementById('searchMinPrice').value;
+            const maxPrice = document.getElementById('searchMaxPrice').value;
+
+            filteredProperties = allProperties.filter(p => {
+                if (location && !p.location.toLowerCase().includes(location)) return false;
+                if (type && p.type !== type) return false;
+                if (minPrice && p.price < parseInt(minPrice)) return false;
+                if (maxPrice && p.price > parseInt(maxPrice)) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderProperties();
+            updateMapMarkers();
+        }
+
+        function applyFilters() {
+            const checkedTypes = Array.from(document.querySelectorAll('.filter-section:first-child input:checked')).map(cb => cb.value);
+            const checkedBedrooms = Array.from(document.querySelectorAll('.filter-section:nth-child(2) input:checked')).map(cb => parseInt(cb.value));
+            const checkedLocations = Array.from(document.querySelectorAll('.filter-section:nth-child(4) input:checked')).map(cb => cb.value);
+            const minPrice = document.getElementById('filterMinPrice').value;
+            const maxPrice = document.getElementById('filterMaxPrice').value;
+
+            filteredProperties = allProperties.filter(p => {
+                if (checkedTypes.length > 0 && !checkedTypes.includes(p.type)) return false;
+                if (checkedBedrooms.length > 0) {
+                    const beds = checkedBedrooms.includes(4) ? [4, 5, 6, 7, 8] : checkedBedrooms;
+                    if (!beds.includes(p.bedrooms)) return false;
+                }
+                if (checkedLocations.length > 0 && !checkedLocations.some(loc => p.location.includes(loc))) return false;
+                if (minPrice && p.price < parseInt(minPrice)) return false;
+                if (maxPrice && p.price > parseInt(maxPrice)) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderProperties();
+            updateMapMarkers();
+        }
+
+        function sortProperties() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            switch(sortBy) {
+                case 'price-low':
+                    filteredProperties.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filteredProperties.sort((a, b) => b.price - a.price);
+                    break;
+                default:
+                    filteredProperties.sort((a, b) => b.id - a.id);
+            }
+            
+            renderProperties();
+        }
+
+        function setView(view) {
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.view-btn').classList.add('active');
+            
+            const grid = document.getElementById('propertiesGrid');
+            if (view === 'list') {
+                grid.classList.add('list-view');
+            } else {
+                grid.classList.remove('list-view');
+            }
+        }
+
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderProperties();
+            }
+        }
+
+        function isInFavorites(id) {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            return favorites.includes(id);
+        }
+
+        function toggleFavorite(id) {
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const index = favorites.indexOf(id);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showToast('Removed from favorites');
+            } else {
+                favorites.push(id);
+                showToast('Added to favorites');
+            }
+            
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            renderProperties();
+        }
+
+        function contactAgent(phone, name) {
+            showToast(`Calling ${name}...`);
+            window.location.href = `tel:${phone.replace(/\s/g, '')}`;
+        }
+
+        function viewProperty(id) {
+            showToast('Property details coming soon!');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

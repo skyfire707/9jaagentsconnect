@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9jaAgentsConnect - Nigeria's #1 Real Estate Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --secondary: #00C853;
+            --accent: #FF6B35;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --gradient: linear-gradient(135deg, #0066FF 0%, #00C853 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(0,102,255,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,102,255,0.4);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--white);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.08)"/><circle cx="40" cy="80" r="2" fill="rgba(255,255,255,0.06)"/></svg>');
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text {
+            max-width: 700px;
+            color: var(--white);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* Search Box */
+        .search-container {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+            box-shadow: var(--shadow-lg);
+            max-width: 900px;
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            color: var(--gray);
+        }
+
+        .search-tab.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .search-input-group {
+            position: relative;
+        }
+
+        .search-input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-input-group input,
+        .search-input-group select {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input-group input:focus,
+        .search-input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+        }
+
+        /* Featured Properties */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .section-title span {
+            color: var(--primary);
+        }
+
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .property-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .property-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .property-image {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .property-card:hover .property-image img {
+            transform: scale(1.1);
+        }
+
+        .property-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-sale {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .badge-rent {
+            background: var(--accent);
+            color: var(--white);
+        }
+
+        .property-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .property-info {
+            padding: 1.5rem;
+        }
+
+        .property-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .property-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .property-location {
+            color: var(--gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .property-features {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .feature i {
+            color: var(--primary);
+        }
+
+        .property-agent {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .agent-phone {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Locations Section */
+        .locations {
+            background: var(--dark);
+            color: var(--white);
+            padding: 5rem 2rem;
+        }
+
+        .locations-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* State Categories */
+        .state-categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .category-btn {
+            padding: 0.625rem 1.25rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: var(--white);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .location-card {
+            position: relative;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .location-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .location-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .location-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+
+        .location-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .location-count {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            background: var(--light);
+            padding: 5rem 2rem;
+        }
+
+        .steps-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: var(--white);
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: var(--gray);
+        }
+
+        /* Agent Section */
+        .agents {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .agent-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .agent-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 4px solid var(--primary);
+        }
+
+        .agent-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-card .location {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .agent-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-stat {
+            text-align: center;
+        }
+
+        .agent-stat-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .agent-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-brand p {
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+        }
+
+        .footer h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .search-form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Map Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1000px;
+            height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        #map {
+            flex: 1;
+            width: 100%;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* NEW: Enhanced Property Card Styles */
+        .property-trust-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--gray);
+            background: var(--light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .trust-badge i {
+            color: var(--secondary);
+        }
+
+        .agent-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .agent-rating span {
+            color: var(--gray);
+        }
+
+        /* NEW: Enhanced Agent Card Styles */
+        .agent-badges-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .agent-specialties-mini {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .specialty-pill {
+            background: var(--light);
+            color: var(--gray);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .agent-quick-info {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .agent-quick-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .agent-quick-info i {
+            color: var(--secondary);
+        }
+
+        .agent-card-premium {
+            border: 2px solid #FFD700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card-premium::before {
+            content: 'PREMIUM';
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: #FFD700;
+            color: #000;
+            padding: 3px 40px;
+            font-size: 10px;
+            font-weight: 700;
+            transform: rotate(45deg);
+        }
+
+        /* NEW: Agent Profile Modal Styles */
+        .agent-profile-content {
+            padding: 1.5rem;
+        }
+
+        .agent-profile-header {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .agent-profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+        }
+
+        .agent-profile-info {
+            flex: 1;
+        }
+
+        .agent-profile-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-location {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-profile-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .agent-profile-rating span {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .agent-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .profile-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .agent-profile-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .profile-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+
+        .agent-profile-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .agent-profile-section h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .specialties-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .specialty-badge {
+            background: var(--primary) + '15';
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .agent-profile-actions {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1.5rem;
+        }
+
+        .agent-profile-actions .btn {
+            flex: 1;
+        }
+
+        /* Review Card Styles */
+        .review-card {
+            padding: 1.25rem;
+            background: var(--light);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .review-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .review-meta {
+            flex: 1;
+        }
+
+        .review-author {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .review-rating {
+            display: flex;
+            gap: 2px;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .review-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .no-reviews {
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+            padding: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .agent-profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .agent-profile-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .agent-profile-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-home"></i>
+                9jaAgentsConnect
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="buy.html">Buy</a></li>
+                    <li><a href="rent.html">Rent</a></li>
+                    <li><a href="agent-register.html">Become an Agent</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline">Sign In</a>
+                <a href="agent-register.html" class="btn btn-primary">List Property - FREE</a>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Find Your Dream Home in <span>Nigeria</span></h1>
+                <p>Connect with verified real estate agents across Lagos, Abuja, Port Harcourt & more. Buy, sell, or rent properties with confidence.</p>
+                
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">15,000+</div>
+                        <div class="stat-label">Properties</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">2,500+</div>
+                        <div class="stat-label">Verified Agents</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Cities Covered</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-tabs">
+                    <button class="search-tab active" onclick="window.location.href='buy.html'">Buy</button>
+                    <button class="search-tab" onclick="window.location.href='rent.html'">Rent</button>
+                    <button class="search-tab" onclick="window.location.href='buy.html'">Land</button>
+                    <button class="search-tab" onclick="window.location.href='buy.html'">Commercial</button>
+                </div>
+                <form class="search-form" onsubmit="searchProperties(event)">
+                    <div class="search-input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="location" placeholder="Enter location (e.g., Lekki, Abuja, Port Harcourt)">
+                    </div>
+                    <div class="search-input-group">
+                        <i class="fas fa-home"></i>
+                        <select id="property-type">
+                            <option value="">Property Type</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="duplex">Duplex</option>
+                            <option value="bungalow">Bungalow</option>
+                            <option value="terrace">Terrace</option>
+                            <option value="mansion">Mansion</option>
+                            <option value="land">Land</option>
+                        </select>
+                    </div>
+                    <div class="search-input-group">
+                        <i class="fas fa-naira-sign"></i>
+                        <select id="price-range">
+                            <option value="">Price Range</option>
+                            <option value="0-10000000">₦0 - ₦10M</option>
+                            <option value="10000000-50000000">₦10M - ₦50M</option>
+                            <option value="50000000-100000000">₦50M - ₦100M</option>
+                            <option value="100000000-500000000">₦100M - ₦500M</option>
+                            <option value="500000000+">₦500M+</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section class="section" id="featured">
+        <div class="section-header">
+            <h2 class="section-title">Featured <span>Properties</span></h2>
+            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="properties-grid" id="properties-grid">
+            <!-- Properties will be loaded by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Locations Section - All 36 States + FCT -->
+    <section class="locations">
+        <div class="locations-container">
+            <h2 class="section-title">Explore All <span style="color: var(--secondary)">36 States + FCT</span></h2>
+            <p style="opacity: 0.8; margin-top: 0.5rem;">Find properties in any city or town across Nigeria</p>
+            
+            <!-- Location Search & Filter -->
+            <div class="location-search-bar">
+                <div class="search-input-group" style="max-width: 500px; margin: 1.5rem auto;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="stateSearch" placeholder="Search states, cities, towns..." 
+                           oninput="searchNigeriaLocations(this.value)">
+                </div>
+            </div>
+            
+            <!-- Geolocation Button -->
+            <div class="detect-location-wrapper" style="text-align: center; margin-bottom: 1.5rem;">
+                <button class="btn btn-outline" onclick="GeoLocationService.detectLocation()">
+                    <i class="fas fa-location-arrow"></i> Detect My Location
+                </button>
+                <span id="detectedLocation" style="margin-left: 1rem; color: var(--gray);"></span>
+            </div>
+            
+            <!-- State Categories -->
+            <div class="state-categories">
+                <button class="category-btn active" onclick="filterStatesByRegion('all')">All States</button>
+                <button class="category-btn" onclick="filterStatesByRegion('south-west')">South-West</button>
+                <button class="category-btn" onclick="filterStatesByRegion('south-east')">South-East</button>
+                <button class="category-btn" onclick="filterStatesByRegion('south-south')">South-South</button>
+                <button class="category-btn" onclick="filterStatesByRegion('north-west')">North-West</button>
+                <button class="category-btn" onclick="filterStatesByRegion('north-east')">North-East</button>
+                <button class="category-btn" onclick="filterStatesByRegion('north-central')">North-Central</button>
+            </div>
+            
+            <!-- States Grid - Dynamically populated -->
+            <div class="locations-grid" id="statesGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <!-- View More Button -->
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-outline" id="viewMoreStates" onclick="toggleAllStates()">
+                    <i class="fas fa-chevron-down"></i> View All States
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="steps-container">
+            <div style="text-align: center;">
+                <h2 class="section-title">How It <span>Works</span></h2>
+                <p style="color: var(--gray); margin-top: 0.5rem;">Get started in 3 simple steps</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Search Properties</h3>
+                    <p>Browse thousands of verified listings across Nigeria. Filter by location, price, property type, and more.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Connect with Agents</h3>
+                    <p>Contact verified real estate agents directly. Schedule viewings and get expert guidance.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Close the Deal</h3>
+                    <p>Complete your transaction with confidence. Our agents guide you through every step.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Agents -->
+    <section class="agents" id="agents">
+        <div class="section-header">
+            <h2 class="section-title">Featured <span>Agents</span></h2>
+            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="agents-grid" id="agents-grid">
+            <!-- Agents loaded by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3><i class="fas fa-home"></i> 9jaAgentsConnect</h3>
+                <p>Nigeria's premier real estate platform connecting buyers, sellers, and verified agents.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4>For Buyers</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Buy Property</a></li>
+                    <li><a href="#">Rent Property</a></li>
+                    <li><a href="#">Property Alert</a></li>
+                    <li><a href="#">Mortgage Calculator</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>For Agents</h4>
+                <ul class="footer-links">
+                    <li><a href="#">List Property</a></li>
+                    <li><a href="#">Agent Dashboard</a></li>
+                    <li><a href="#">Pricing Plans</a></li>
+                    <li><a href="#">Success Stories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 9jaAgentsConnect. All rights reserved. Made with ❤️ for Nigeria.</p>
+        </div>
+    </footer>
+
+    <!-- Map Modal -->
+    <div class="modal" id="mapModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Property Location</h3>
+                <button class="modal-close" onclick="closeMap()">&times;</button>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data/nigeria-locations.js"></script>
+    <script src="components/reviews.js"></script>
+    <script src="components/verification.js"></script>
+    <script src="components/booking.js"></script>
+    <script src="components/advanced-filters.js"></script>
+    <script src="components/geolocation.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Initialize geolocation on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            GeoLocationService.init();
+            renderStatesGrid();
+            // Auto-detect location after 2 seconds
+            setTimeout(() => {
+                GeoLocationService.detectLocation({ showModal: false });
+            }, 2000);
+        });
+
+        // State region mapping
+        const stateRegions = {
+            'south-west': ['lagos', 'ogun', 'oyo', 'osun', 'ondo', 'ekiti'],
+            'south-east': ['anambra', 'enugu', 'imo', 'abia', 'ebonyi'],
+            'south-south': ['rivers', 'akwa_ibom', 'cross_river', 'delta', 'bayelsa', 'edo'],
+            'north-west': ['kano', 'kaduna', 'katsina', 'kebbi', 'sokoto', 'zamfara', 'jigawa'],
+            'north-east': ['borno', 'yobe', 'bauchi', 'gombe', 'adamawa', 'taraba'],
+            'north-central': ['niger', 'kwara', 'kogi', 'benue', 'plateau', 'nasarawa', 'fct']
+        };
+
+        let currentRegionFilter = 'all';
+        let showAllStates = false;
+
+        // Render states grid
+        function renderStatesGrid() {
+            const grid = document.getElementById('statesGrid');
+            if (!grid) return;
+
+            let states = LocationHelpers.getAllStates();
+            
+            // Filter by region if selected
+            if (currentRegionFilter !== 'all') {
+                const regionStates = stateRegions[currentRegionFilter];
+                states = states.filter(s => regionStates.includes(s.id));
+            }
+
+            // Show limited or all based on toggle
+            const displayStates = showAllStates ? states : states.slice(0, 8);
+            
+            grid.innerHTML = displayStates.map(state => {
+                const cities = LocationHelpers.getStateCities(state.id);
+                const mainCities = cities.filter(c => c.type === 'capital' || c.type === 'city').slice(0, 3);
+                
+                return `
+                    <div class="location-card state-card" onclick="showStateCities('${state.id}')">
+                        <div class="state-initial">${state.name.charAt(0)}</div>
+                        <div class="location-overlay state-overlay">
+                            <div class="location-name">${state.name}</div>
+                            <div class="location-count">${cities.length} locations</div>
+                            <div class="state-cities-preview">${mainCities.map(c => c.name).join(', ')}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update button text
+            const viewMoreBtn = document.getElementById('viewMoreStates');
+            if (viewMoreBtn) {
+                viewMoreBtn.innerHTML = showAllStates ? 
+                    '<i class="fas fa-chevron-up"></i> Show Less' : 
+                    '<i class="fas fa-chevron-down"></i> View All States';
+            }
+        }
+
+        // Filter states by region
+        function filterStatesByRegion(region) {
+            currentRegionFilter = region;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(region.replace('-', ' ')) || 
+                    (region === 'all' && btn.textContent === 'All States')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderStatesGrid();
+        }
+
+        // Toggle show all states
+        function toggleAllStates() {
+            showAllStates = !showAllStates;
+            renderStatesGrid();
+        }
+
+        // Show cities for a state
+        function showStateCities(stateId) {
+            const state = NigeriaLocations[stateId];
+            if (!state) return;
+
+            const cities = state.cities;
+            const modalHTML = `
+                <div class="modal active" id="stateCitiesModal">
+                    <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-map-marker-alt"></i> ${state.name} - Select City</h3>
+                            <button class="modal-close" onclick="closeModal('stateCitiesModal')">&times;</button>
+                        </div>
+                        <div class="cities-grid-modal">
+                            ${cities.map(city => `
+                                <button class="city-card-btn" onclick="selectCity('${city.name}', '${stateId}')">
+                                    <div class="city-name-main">${city.name}</div>
+                                    <div class="city-type">${city.type}</div>
+                                    ${city.type === 'capital' ? '<span class="capital-badge">Capital</span>' : ''}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        // Select city
+        function selectCity(cityName, stateId) {
+            GeoLocationService.setLocation(cityName, stateId);
+            closeModal('stateCitiesModal');
+        }
+
+        // Search Nigeria locations
+        function searchNigeriaLocations(query) {
+            if (!query || query.length < 2) {
+                renderStatesGrid();
+                return;
+            }
+
+            const results = LocationHelpers.searchLocations(query);
+            const grid = document.getElementById('statesGrid');
+            
+            if (results.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: var(--gray); grid-column: 1/-1;">No locations found. Try searching for a city or state name.</p>';
+                return;
+            }
+
+            grid.innerHTML = results.map(result => {
+                if (result.type === 'state') {
+                    return `
+                        <div class="location-card state-card search-result" onclick="showStateCities('${result.key}')">
+                            <div class="state-initial">${result.name.charAt(0)}</div>
+                            <div class="location-overlay state-overlay">
+                                <div class="location-name">${result.name}</div>
+                                <div class="location-count">State</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="location-card state-card search-result" onclick="selectCity('${result.name}', '${result.stateKey}')">
+                            <div class="state-initial">${result.name.charAt(0)}</div>
+                            <div class="location-overlay state-overlay">
+                                <div class="location-name">${result.name}</div>
+                                <div class="location-count">${result.state}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+    </script>
+    
+    <style>
+        /* State Card Styles */
+        .state-card {
+            position: relative;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        
+        .state-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .state-initial {
+            font-size: 4rem;
+            font-weight: 800;
+            color: rgba(255,255,255,0.2);
+            position: absolute;
+        }
+        
+        .state-overlay {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .state-cities-preview {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+        
+        /* Cities Modal Grid */
+        .cities-grid-modal {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .city-card-btn {
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .city-card-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary) + '05';
+        }
+        
+        .city-name-main {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .city-type {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: capitalize;
+        }
+        
+        .capital-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--secondary);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        /* Location Search */
+        .location-search-bar input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .location-search-bar input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .location-search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        
+        .search-input-group {
+            position: relative;
+        }
+        
+        .search-input-group i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "9jaagentsconnect",
+  "version": "1.0.0",
+  "description": "Nigeria's Premier Real Estate Platform - Connect with verified agents across Lagos, Abuja, Port Harcourt & more",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "nodemon api/server.js",
+    "build": "echo 'Static site - no build needed'",
+    "test": "echo 'Tests coming soon'",
+    "deploy": "npm run build && netlify deploy --prod",
+    "lint": "eslint .",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "real-estate",
+    "nigeria",
+    "lagos",
+    "abuja",
+    "property",
+    "agents",
+    "9ja",
+    "homes",
+    "apartments",
+    "realty"
+  ],
+  "author": "9jaAgentsConnect Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "eslint": "^8.48.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/9jaagentsconnect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/9jaagentsconnect/issues"
+  },
+  "homepage": "https://9jaagentsconnect.com"
+}
