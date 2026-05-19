@@ -705,39 +705,80 @@ function formatNaira(amount) {
     return '₦' + amount.toLocaleString('en-NG');
 }
 
-// API Simulation (Replace with actual backend calls)
-const API = {
+// Backend API Integration
+// Uses real API when available, falls back to sample data
+
+const BackendAPI = {
     async getProperties(filters = {}) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        let filtered = [...sampleProperties];
-        
-        if (filters.location) {
-            filtered = filtered.filter(p => 
-                p.location.toLowerCase().includes(filters.location.toLowerCase())
-            );
+        try {
+            const queryParams = new URLSearchParams();
+            if (filters.location) queryParams.set('q', filters.location);
+            if (filters.listingType) queryParams.set('listingType', filters.listingType);
+            if (filters.minPrice) queryParams.set('minPrice', filters.minPrice);
+            if (filters.maxPrice) queryParams.set('maxPrice', filters.maxPrice);
+            
+            const response = await fetch(`${API_BASE_URL}/properties/search?${queryParams}`);
+            if (!response.ok) throw new Error('API Error');
+            const data = await response.json();
+            return data.properties || [];
+        } catch (err) {
+            console.log('Using sample data (API unavailable)');
+            // Fallback to sample data
+            let filtered = [...sampleProperties];
+            if (filters.location) {
+                filtered = filtered.filter(p => 
+                    p.location.toLowerCase().includes(filters.location.toLowerCase())
+                );
+            }
+            return filtered;
         }
-        
-        if (filters.minPrice) {
-            filtered = filtered.filter(p => p.price >= filters.minPrice);
-        }
-        
-        if (filters.maxPrice) {
-            filtered = filtered.filter(p => p.price <= filters.maxPrice);
-        }
-        
-        return filtered;
     },
     
     async getAgents() {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        return sampleAgents;
+        try {
+            const response = await fetch(`${API_BASE_URL}/agents`);
+            if (!response.ok) throw new Error('API Error');
+            const data = await response.json();
+            return data.agents || [];
+        } catch (err) {
+            console.log('Using sample agents (API unavailable)');
+            return sampleAgents;
+        }
+    },
+    
+    async getPropertyById(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/properties/${id}`);
+            if (!response.ok) throw new Error('API Error');
+            return await response.json();
+        } catch (err) {
+            return sampleProperties.find(p => p.id === id) || null;
+        }
+    },
+    
+    async getAgentById(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/agents/${id}`);
+            if (!response.ok) throw new Error('API Error');
+            return await response.json();
+        } catch (err) {
+            return sampleAgents.find(a => a.id === id) || null;
+        }
+    }
+};
+
+// Legacy API wrapper for backwards compatibility
+const API = {
+    async getProperties(filters = {}) {
+        return BackendAPI.getProperties(filters);
+    },
+    
+    async getAgents() {
+        return BackendAPI.getAgents();
     },
     
     async contactAgent(agentId, message) {
-        // Simulate sending message
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // This would use the inquiry API
         return { success: true, message: 'Message sent successfully' };
     }
 };

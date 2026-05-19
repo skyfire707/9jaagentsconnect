@@ -3,7 +3,7 @@
 
 const API_BASE_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:5000/api'
-  : 'https://9jaagentsconnect-api.up.railway.app/api'; // Change this after Railway deploy
+  : 'https://angelic-playfulness-production-08a7.up.railway.app/api';
 
 // API Helper
 const api = {
